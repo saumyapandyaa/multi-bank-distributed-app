@@ -1,14 +1,17 @@
-from kafka import KafkaProducer
-import json
+# app/kafka_producer.py
+import logging
+from typing import Any, Optional
 
-KAFKA_SERVER = "kafka:9092"
-TOPIC = "bank-transactions"
+logger = logging.getLogger(__name__)
 
-producer = KafkaProducer(
-    bootstrap_servers=KAFKA_SERVER,
-    value_serializer=lambda v: json.dumps(v).encode("utf-8")
-)
 
-def publish_event(event: dict):
-    producer.send(TOPIC, event)
-    producer.flush()
+def publish_event(topic: str, key: Optional[str], value: Any) -> None:
+    """
+    Dummy Kafka publisher: we removed Kafka, so just log the event.
+    """
+    logger.info(
+        "Kafka disabled. Would publish to topic=%s key=%s value=%s",
+        topic,
+        key,
+        value,
+    )
