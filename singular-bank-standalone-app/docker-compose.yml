@@ -5,17 +5,20 @@ services:
       context: ./backend
     container_name: bank1-backend
     environment:
-      - BANK_ID=bank1
+      - BANK_ID=BANK1
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     ports:
-      - "8001:8000"
+      - "8001:8000" # host:container
+    depends_on:
+      - kafka
 
   bank1-frontend:
     build:
       context: ./teller-dashboard
     container_name: bank1-frontend
     environment:
-      # 👇 match what apiClient.js expects, and point to host port 8001
-      - REACT_APP_BACKEND_URL=http://localhost:8001
+      # 👇 MUST MATCH what apiClient.js uses: REACT_APP_BACKEND_URL
+      - REACT_APP_BACKEND_URL=http://bank1-backend:8000
     ports:
       - "3001:80"
     depends_on:
@@ -27,18 +30,41 @@ services:
       context: ./backend
     container_name: bank2-backend
     environment:
-      - BANK_ID=bank2
+      - BANK_ID=BANK2
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     ports:
       - "8002:8000"
+    depends_on:
+      - kafka
 
   bank2-frontend:
     build:
       context: ./teller-dashboard
     container_name: bank2-frontend
     environment:
-      # 👇 bank2 talks to host port 8002
-      - REACT_APP_BACKEND_URL=http://localhost:8002
+      - REACT_APP_BACKEND_URL=http://bank2-backend:8000
     ports:
       - "3002:80"
     depends_on:
       - bank2-backend
+
+  # ---------- SHARED ZOOKEEPER + KAFKA ----------
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper

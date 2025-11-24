@@ -6,3 +6,4 @@ python-jose
 passlib[bcrypt]
 aiosqlite
 kafka-python
+kafka-python

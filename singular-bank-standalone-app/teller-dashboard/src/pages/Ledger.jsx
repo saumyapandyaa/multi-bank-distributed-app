@@ -17,6 +17,13 @@ export default function Ledger() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
+  // 👇 detect which bank this frontend is for, based on the port
+  const port = window.location.port;
+  const bankLabel =
+    port === "3001" ? "Bank 1" :
+    port === "3002" ? "Bank 2" :
+    "Bank";
+
   const loadUsers = () => {
     getUsers().then((res) => setUsers(res.data));
   };
@@ -39,8 +46,16 @@ export default function Ledger() {
             <p className="text-sm uppercase tracking-[0.35em] text-muted-foreground">
               Ledger
             </p>
-            <h1 className="text-4xl font-semibold text-slate-900">
-              Customer directory
+            <h1 className="text-4xl font-semibold text-slate-900 flex items-center gap-2">
+              <span>Customer directory</span>
+              {/* 👇 small badge to show which bank */}
+              <Badge
+  variant="outline"
+  className="text-sm px-3 py-1.5 font-medium"
+>
+  {bankLabel}
+</Badge>
+
             </h1>
           </div>
 
@@ -68,7 +83,9 @@ export default function Ledger() {
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>All customers</CardTitle>
-              <CardDescription>Tap a row to jump straight into a dashboard.</CardDescription>
+              <CardDescription>
+                Tap a row to jump straight into a dashboard.
+              </CardDescription>
             </div>
             <Badge variant="outline">Total users · {users.length}</Badge>
           </CardHeader>

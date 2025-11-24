@@ -179,7 +179,7 @@ def transfer_same_bank(
 
 
 # ----------------------------------------------------------
-# Cross-bank external transfer (via Kafka)
+# Cross-bank external transfer
 # ----------------------------------------------------------
 @router.post("/external-transfer")
 def external_transfer(
@@ -214,16 +214,19 @@ def external_transfer(
     db.add(tx)
     db.commit()
 
-    # Publish to Kafka
     event = {
         "tx_id": tx.tx_id,
         "from_bank": origin_bank,
         "destination_bank": request.destination_bank,
         "to_account": request.to_account,
-        "amount": request.amount
+        "amount": request.amount,
     }
 
-    publish_event(event)
+    # Don't let Kafka failure kill the whole request
+    try:
+        publish_event(key=tx.tx_id, value=event)
+    except Exception as e:
+        print(f"[KAFKA] Failed to publish event: {e}")
 
     return {"message": "External transfer sent", "tx_id": tx.tx_id}
 

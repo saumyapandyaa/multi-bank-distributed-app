@@ -1,17 +1,36 @@
 # app/kafka_producer.py
-import logging
-from typing import Any, Optional
+import os
+import json
+from kafka import KafkaProducer
 
-logger = logging.getLogger(__name__)
+KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+TOPIC = "cross-bank-transfers"
+
+_producer = None
 
 
-def publish_event(topic: str, key: Optional[str], value: Any) -> None:
+def get_producer() -> KafkaProducer:
     """
-    Dummy Kafka publisher: we removed Kafka, so just log the event.
+    Lazily create a KafkaProducer the first time we need it.
+    Avoids crashing the app at import time if Kafka isn't ready yet.
     """
-    logger.info(
-        "Kafka disabled. Would publish to topic=%s key=%s value=%s",
-        topic,
-        key,
-        value,
-    )
+    global _producer
+    if _producer is None:
+        _producer = KafkaProducer(
+            bootstrap_servers=KAFKA_BOOTSTRAP,
+            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+            key_serializer=lambda k: k.encode("utf-8"),
+        )
+    return _producer
+
+
+def publish_event(key: str, value: dict) -> None:
+    """
+    Publish a cross-bank transfer event.
+
+    key = partitioning key (e.g., tx_id)
+    value = event payload (dict)
+    """
+    producer = get_producer()
+    producer.send(TOPIC, key=key, value=value)
+    producer.flush()

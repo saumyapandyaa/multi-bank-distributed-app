@@ -52,6 +52,6 @@ class SameBankUserTransferRequest(BaseModel):
 
 class ExternalTransferRequest(BaseModel):
     from_account: str
-    destination_bank: str
     to_account: str
+    destination_bank: str  # "BANK1" or "BANK2"
     amount: float
