@@ -68,3 +68,15 @@ export const createCard = (userId, cardType) =>
 
 export const deleteCard = (cardNumber) =>
   apiClient.delete(`/cards/delete/${encodeURIComponent(cardNumber)}`);
+
+/* ------------------------
+   EXTERNAL TRANSFER
+-------------------------*/
+
+export const externalTransfer = (fromAcc, toAcc, destinationBank, amount) =>
+  apiClient.post("/transactions/external-transfer", {
+    from_account: fromAcc,
+    to_account: toAcc,
+    destination_bank: destinationBank,
+    amount: Number(amount),
+  });

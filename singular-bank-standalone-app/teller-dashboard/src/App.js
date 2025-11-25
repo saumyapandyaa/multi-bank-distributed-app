@@ -6,6 +6,7 @@ import TellerDashboard from "./pages/TellerDashboard";
 import Deposit from "./pages/Deposit";
 import Withdraw from "./pages/Withdraw";
 import SameBranchTransfer from "./pages/SameBranchTransfer";
+import ExternalTransfer from "./pages/ExternalTransfer";
 
 
 // New pages
@@ -48,7 +49,10 @@ function App() {
           path="/users/:userId/transfer/internal"
           element={<InternalTransfer />}
         />
-
+  <Route
+          path="/users/:userId/transfer/external"
+          element={<ExternalTransfer />}
+        />
         <Route
           path="/users/:userId/transfer/same-branch"
           element={<SameBranchTransfer />}

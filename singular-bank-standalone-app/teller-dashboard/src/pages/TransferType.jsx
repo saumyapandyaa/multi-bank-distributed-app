@@ -32,11 +32,11 @@ const transferOptions = [
   },
   {
     title: "External transfer",
-    description: "Schedule disbursements to other banks (coming soon).",
+    description: "Send funds to accounts in another bank.",
     accent: "bg-emerald-500/10 text-emerald-600",
     icon: FaUniversity,
     action: "external",
-    disabled: true,
+    disabled: false,
   },
 ];
 
